@@ -1,0 +1,21 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker info
+    - docker build -t nodetest201701 .
+
+test:
+  override:
+    - docker docker run -d -p 4001:4000 nodetest201701; sleep 10
+    - curl --retry 10 --retry-delay 5 -v http://localhost:4001
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker login -e "noname@nothing.com" -u "techopsdevops" -p "/5c+JPJnQqa4t+Maed=vDj2hTcxaqZN="
+      - docker tag nodetest201701 techopsdevops.azurecr.io/nodetest201701:latest 
+      - docker push techopsdevops.azurecr.io/nodetest201701:latest
